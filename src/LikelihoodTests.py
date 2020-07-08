@@ -161,7 +161,7 @@ def RunRaxml(Folder,raxml,dna,logfile):
     for x in array:
         array2 = x.split(".")
         if array2[-1] == "aln":
-            cmd = raxml + "-T 2 -s " + Folder + x + " -p 12345 -m " + model + " -n " + array2[0]
+            cmd = raxml + " -T 2 -s " + Folder + x + " -p 12345 -m " + model + " -n " + array2[0]
             logfile.write("RaxML command: " + cmd + "\n")
             os.system(cmd)
             cmd = "mv " + "RAxML*" + array2[0] + " " + Folder

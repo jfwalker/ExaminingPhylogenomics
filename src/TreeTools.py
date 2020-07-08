@@ -172,35 +172,179 @@ def matches_and_taxa(genome_seqs,clade):
     else:
         return 99999999
 
+#get the largest bipartition that is only genomes
+#if that is equal to all the genomes then there is
+#no outgroup that's popped into the ingroup
+def get_smallest_outgroup(clades,genome_seqs):
+    
+    good = True
+    left_array = []
+    right_array = []
+    largest = []
+    temp = 0
+    
+    for x in clades:
+        left_array = x.split("|")[0][:-1].split(",")
+        good = only_genomes(left_array,genome_seqs)
+        if good == True:
+            if temp < len(left_array):
+                temp = len(left_array)
+                largest = left_array
+        right_array = x.split("|")[1][1:].split(",")
+        good = only_genomes(right_array,genome_seqs)
+        if good == True:
+            if temp < len(right_array):
+                temp = len(right_array)
+                largest = right_array
+    
+    if temp == len(genome_seqs):
+        return largest,True
+    else:
+        return largest,False
+
+#checks to see if a bipartitions is composed of only genomes
+def only_genomes(bip,genomes):
+    if(set(bip).issubset(set(genomes))):
+        return True
+    else:
+        return False
+
+def get_number_of_unique_arrays_in_array_of_arrays(further_test):
+    
+    #grabbed from stack overflow because everything has been asked on there
+    unique_data = [list(x) for x in set(tuple(x) for x in further_test)]
+    return unique_data
+
+#takes in two arrays and removes the target sequences from
+#Array1
+def remove_overlap(Array1,SequencesYouWantRemoved):
+
+    return_array = []
+    for x in Array1:
+        if x not in SequencesYouWantRemoved:
+            return_array.append(x)
+    return return_array
+
+#get the number of one arrays seqs that are in another
+def Array_matches(Array1,Array2,number_to_beat):
+
+    count = 0
+    for x in Array1:
+        if x in Array2:
+            count += 1
+    if count == number_to_beat:
+        return count
+    else:
+        return 0
+
+
+#get clades without genomes and those with genomes
+def get_smallest_ingroup_given(clades,genome_seqs,ingroupname):
+    
+    genome_seqs.append(ingroupname)
+    largest_genome = []
+    largest_genome,ans = get_smallest_outgroup(clades,genome_seqs)
+    
+    #If they all form one giant cluster or if they separate into one cluster
+    #and one spare indicating they exhibit no more than 2 edges
+    if len(largest_genome) == len(genome_seqs):
+        return "Forms one clade",False
+    if len(largest_genome) == (len(genome_seqs)-1):
+        return "Forms one clade and one tip",False
+    
+    #if only two taxa exist, then it's possible one is ingroup and one is outgroup
+    #hard to tell if it's any orthology issue
+    if len(genome_seqs) == 2:
+        return "Separate biparts but only two genomes so no orthology statement",False
+    
+    genomes_remaining = remove_overlap(genome_seqs,largest_genome)
+    
+    number_to_beat = 0
+    second_largest = []
+    #remove and look for next largest (do they again take up two edges)
+    for x in clades:
+        left_array = x.split("|")[0][:-1].split(",")
+        right_array = x.split("|")[1][1:].split(",")
+        new_right = remove_overlap(right_array,largest_genome)
+        new_left = remove_overlap(left_array,largest_genome)
+        #get the bipart with the most only genomes
+        genomes_left_bipart = only_genomes(new_left,genomes_remaining)
+        if genomes_left_bipart == True:
+            if number_to_beat < len(new_left):
+                number_to_beat = len(new_left)
+                second_largest = new_left
+        
+        genomes_right_bipart = only_genomes(new_right,genomes_remaining)
+        if genomes_right_bipart == True:
+            if number_to_beat < len(new_right):
+                number_to_beat = len(new_right)
+                second_largest = new_right
+    
+    running_genomes = []
+    running_genomes.append(largest_genome)
+    running_genomes.append(second_largest)
+    #get the size of the contents of running_genomes since it is an array of arrays
+    running_genomes_true_size = len(largest_genome) + len(second_largest)
+    #This means that they've formed two perfect clades, which is also
+    #indistinguishable from proper orthology in an unrooted tree
+    if running_genomes_true_size == len(genome_seqs):
+        return "Forms two clades",False
+
+    return "Hard to define by two edges",True
+
+'''
 #get smallest Genome seq bipartition
-def get_smallest(clades,genome_seqs):
+#This is a bit trickier if using an ingroup
+#Conditions would be that the ingroup can form
+#two clades, one that only contains itself duplication
+#prior to orthology and one that contains the rest plus other seqs
+#Their cannot be a third one though
+def get_smallest_ingroup(clades,genome_seqs):
     
     left_array = []
     right_array = []
     bip_in_question = []
+    further_test = []
+    other_clades = []
     smallest_clade = 0
     compassing_clade = 9999999
+    only_genome_clade = []
+    only_genome_clade_count = 0
+    unique_genome_clades = []
+    genome_seq_pos = 0
+    all_clades_of_genome = []
     
-    for x in clades:
-        left_bip = x.split("|")[0]
-        right_bip = x.split("|")[1]
-        left_array = left_bip[:-1].split(",")
-        right_array = left_bip[:-1].split(",")
-        smallest_clade = matches_and_taxa(genome_seqs,left_array)
-        if smallest_clade < compassing_clade:
-            compassing_clade = smallest_clade
-            bip_in_question = left_array
-        smallest_clade = matches_and_taxa(genome_seqs,right_array)
-        if smallest_clade < compassing_clade:
-            compassing_clade = smallest_clade
-            bip_in_question = left_array
     
-    if len(genome_seqs) < (compassing_clade-1):
-        return bip_in_question,True
-    else:
-        return bip_in_question,False
-        
+    for y in genome_seqs:
+        temp =[]
+        temp.append(y)
+        bip_in_question,ans = get_smallest_outgroup(clades,temp)
+        ans = only_genomes(bip_in_question,genome_seqs)
+        if ans == True:
+            only_genome_clade_count += 1
+            bip_in_question.sort()
+            only_genome_clade.append(bip_in_question)
+        else:
+            bip_in_question.sort()
+            further_test.append(bip_in_question)
+    other_clades = get_number_of_unique_arrays_in_array_of_arrays(further_test)
+    unique_genome_clades = get_number_of_unique_arrays_in_array_of_arrays(only_genome_clade)
 
+    #If unique_genome_clades has more than 1 that can be a red flag
+    #if other clades has more than 1 that can be a red flag
+    #basically if the sum of the two of those is great than 2 than thats
+    #a violation of orthology on the tree
+    genome_seq_pos = len(unique_genome_clades) + len(other_clades)
+    all_clades_of_genome = unique_genome_clades + other_clades
+    
+    #current issue (Genome,(Genome,Seq)) is counted as two
+    #Maybe check to see if the other clades all contain the same Seq(s)?
+    #Other issue Genome over counting
+    if 2 < genome_seq_pos:
+        return True,all_clades_of_genome
+    else:
+        return False,all_clades_of_genome
+'''
 def get_seqs_from_genomes(array):
     
     array2 = []
@@ -211,15 +355,16 @@ def get_seqs_from_genomes(array):
 
 #designed to see if all genomes are in one connected clade or
 #if it's not possible to have them all in one bipartition
-def identify_ortho_issue(Folder,logfile):
+def identify_ortho_issue(Folder,ingroup,logfile):
 
     array = []
     HASH = {}
     array = os.listdir(Folder)
+    ingroup_array = []
     Extras.get_time("Dissecting Trees: ",logfile)
     
-    outw = open("OrthologyAnalysis.csv","w")
-    
+    outw = open("OutgroupOrthologyAnalysis.csv","w")
+    outw2 = open("IngroupOrthologyAnalysis.csv","w")
     #get the gene conversion
     con_file = open("gene_conversion.csv","r")
     con_file.readline()
@@ -231,7 +376,8 @@ def identify_ortho_issue(Folder,logfile):
     clades = []
     genome_seqs = []
     bipartition = []
-    outw.write("Gene,WithGenome,OrthologyInvestigate,SmallestBipartitionWithGenomes\n")
+    outw.write("Gene,WithGenome,OrthologyInvestigate,Genomes\n")
+    outw2.write("Gene,WithGenome,OrthologyInvestigate,ReasonForSuggestion\n")
     for x in array:
         if x[6:14] == "bestTree":
             tree = open(Folder+x,"r")
@@ -242,10 +388,17 @@ def identify_ortho_issue(Folder,logfile):
             
             #get the smallest bipartition that contains all the genome
             #seqs in it
-            bipartition,ortho_error = get_smallest(clades,genome_seqs)
+            bipartition,ortho_error = get_smallest_outgroup(clades,genome_seqs)
             gene = x.split(".")[1]
-            outw.write(HASH[gene] + "," + gene + "," + str(ortho_error) + "," + " ".join(bipartition)+"\n")
-
+            outw.write(HASH[gene] + "," + gene + "," + str(ortho_error)+"\n")
+            advice = False
+            if ingroup != "":
+                advice,ortho_error = get_smallest_ingroup_given(clades,genome_seqs,ingroup)
+           
+            outw2.write(HASH[gene] + "," + gene + "," + str(ortho_error) + "," + advice +"\n")
+            
+    outw.close()
+    outw2.close()
 #compare two arrays of trees in bipart form
 def compare_array_biparts(array1,array2):
 

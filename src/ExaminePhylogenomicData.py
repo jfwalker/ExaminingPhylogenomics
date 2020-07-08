@@ -26,7 +26,7 @@ def generate_argparser():
     parser.add_argument("-m", "--LocationOfMafft", required=False, type=str, help="""Used for orthology check""")
     parser.add_argument("-g", "--genome_file", required=False, type=str, help="""Used for orthology check""")
     parser.add_argument("-r", "--raxml_location", required=False, type=str, help="""Location of raxml""")
-    parser.add_argument("-i", "--iqtree_location", required=False, type=str, help="""Location of iqtree""")
+    parser.add_argument("-i", "--ingroup", required=False, type=str, help="""Genome of the ingroup for orthology""")
     parser.add_argument("-d", "--divide_matrix", required=False, type=str, help="""divide supermatrix into the genes and place them in specified folder""")
     parser.add_argument("-l", "--log_file", type=str, help="""Output file""")
     return parser
@@ -89,22 +89,35 @@ def main(arguments=None):
         NoRun = False
         Extras.get_time("=================Orthology Test=======================",outw)
         #1st) blast sequences in folder against the genome
-        dna = FastaTools.blast_it(args.FolderOfFastas,args.blast,args.genome_file,outw)
+        #dna = FastaTools.blast_it(args.FolderOfFastas,args.blast,args.genome_file,outw)
         #2nd) Extract the sequences and create new ones with genome seqs in it
-        FastaTools.extract_blast("Genome.fa","seq_ortho_test.rawblast","TempOrthoFolder/")
+        #FastaTools.extract_blast("Genome.fa","seq_ortho_test.rawblast","TempOrthoFolder/")
         #3rd) Align the new fastas
-        FastaTools.align_folder("TempOrthoFolder/",args.LocationOfMafft,outw)
+        #FastaTools.align_folder("TempOrthoFolder/",args.LocationOfMafft,outw)
         #4th) Infer Tree from the new alignment
-        LikelihoodTests.RunRaxml("TempOrthoFolder/",args.raxml_location,dna,outw)
+        #LikelihoodTests.RunRaxml("TempOrthoFolder/",args.raxml_location,dna,outw)
         #5th) Examine placement of genome compared to rest
-        TreeTools.identify_ortho_issue("TempOrthoFolder/",outw)
+        if args.ingroup:
+            TreeTools.identify_ortho_issue("TempOrthoFolder/",args.ingroup,outw)
+        else:
+            TreeTools.identify_ortho_issue("TempOrthoFolder/","",outw)
     
     '''
     If nothing ran then print this
     '''
     if NoRun == True:
         Extras.get_time("Program Died :(", outw)
-        print "To run the program needs the files and locations of programs necessary to perform the analyses needed. Each setting will say in it's description what it is used for.\n\nFor info run: python OutlierDissection.py -h\n"
+        print "To run the program needs the files and locations of programs\nnecessary to perform the analyses needed. Each setting\nwill say in it's description what it is used for.\n\nFor info run: python ExaminePhylogenomicData.py -h\n"
+        print "================================================================"
+        print "If you want to extract the fastas from your supermatrix and put\nthem into a separate folder you'll need to give the following arguments\n -d the folder you want the results in\n -z The supermatrix \n -q The partition file"
+        print "================================================================"
+        print "For the orthology test you will need to give the following arguments\n -f FolderWithFastas\n -b Location of blast\n -m Location of mafft\n -r Location of raxml\n -g Fasta of GenomeFile or reference of some kind"
+        print "================================================================"
+        print "For alignment based outlying behavior, you'll need\n -s SpeciesTrees \n -z Supermatrix.fa \n -q PartitionFile (raxml formatted) \n -r Location of raxml"
+        print "================================================================"
+        print "If you want to compare the ML topology to the GWLL then you'll want to also specify\n -t Folder of gene trees"
+        print "================================================================"
+        print "If none of this makes sense or you would like anything added to\nthe program please open an issue on github or contact jfwalker@umich.edu"
 
 if __name__ == "__main__":
     main()
