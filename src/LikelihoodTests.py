@@ -123,27 +123,31 @@ def RunRaxML_TwoTop(sp_tree,supermatrix,parts,raxml,logfile):
     trees = 0
     dna = True
     
-    genes = Extras.get_lines(parts)
-    taxa = Extras.get_lines(supermatrix,True)
-    trees = Extras.get_lines(sp_tree)
+    isFile = Extras.check_if_happened("RAxML_perSiteLLs.Topologies_SSLL","Already ran RAxML SSLL, skipping to summarizing it")
+    if isFile == False:
+        genes = Extras.get_lines(parts)
+        taxa = Extras.get_lines(supermatrix,True)
+        trees = Extras.get_lines(sp_tree)
     
-    #check over the parts file and die if something is off
-    p = open(parts,"r")
-    dna = FastaTools.get_part_format(p.readline(),logfile)
-    p.close()
+        #check over the parts file and die if something is off
+        p = open(parts,"r")
+        dna = FastaTools.get_part_format(p.readline(),logfile)
+        p.close()
     
-    print "===================================================================="
-    logfile.write("==================================================================\n")
-    print "Analyzing " + str(genes) + " with " + str(taxa) + " taxa and " + str(trees) + " trees"
-    logfile.write("Analyzing " + str(genes) + " with " + str(taxa) + " taxa and " + str(trees) + " trees\n")
-    if dna == True:
-        cmd = raxml + " -f G -T 2 -s " + supermatrix + " -q " + parts + " -m GTRGAMMA " + " -z " + sp_tree + " -n Topologies_SSLL"
+        print "===================================================================="
+        logfile.write("==================================================================\n")
+        print "Analyzing " + str(genes) + " with " + str(taxa) + " taxa and " + str(trees) + " trees"
+        logfile.write("Analyzing " + str(genes) + " with " + str(taxa) + " taxa and " + str(trees) + " trees\n")
+        if dna == True:
+            cmd = raxml + " -f G -T 2 -s " + supermatrix + " -q " + parts + " -m GTRGAMMA " + " -z " + sp_tree + " -n Topologies_SSLL"
+        else:
+            cmd = raxml + " -f G -T 2 -s " + supermatrix + " -q " + parts + " -m PROTGAMMAWAG " + " -z " + sp_tree + " -n Topologies_SSLL"
+        print "Running your command: " + cmd
+        logfile.write("Your raxml command " + cmd + "\n")
+        os.system(cmd)
+        logfile.write("Command has run your results are in: RAxML_perSiteLLs.Topologies_SSLL\n")
     else:
-        cmd = raxml + " -f G -T 2 -s " + supermatrix + " -q " + parts + " -m PROTGAMMAWAG " + " -z " + sp_tree + " -n Topologies_SSLL"
-    print "Running your command: " + cmd
-    logfile.write("Your raxml command " + cmd + "\n")
-    #os.system(cmd)
-    logfile.write("Command has run your results are in: RAxML_perSiteLLs.Topologies_SSLL\n")
+        print "Please delete or move RAxML files in folder if you'd like to redo the SSLL analysis. Specifically\n-RAxML_info.Topologies_SSLL\nRAxML_perSiteLLs.Topologies_SSLL"
     
     get_GWLLand_SSLL(parts,"RAxML_perSiteLLs.Topologies_SSLL",logfile)
     

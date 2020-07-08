@@ -7,6 +7,7 @@ import FastaTools
 import argparse
 import LikelihoodTests
 import TreeTools
+import os
 
 def generate_argparser():
 
@@ -89,18 +90,29 @@ def main(arguments=None):
         NoRun = False
         Extras.get_time("=================Orthology Test=======================",outw)
         #1st) blast sequences in folder against the genome
-        #dna = FastaTools.blast_it(args.FolderOfFastas,args.blast,args.genome_file,outw)
-        #2nd) Extract the sequences and create new ones with genome seqs in it
-        #FastaTools.extract_blast("Genome.fa","seq_ortho_test.rawblast","TempOrthoFolder/")
+        isFile = Extras.check_if_happened("TempOrthoFolder/","TempOrthoFolder already exists moving to Genome Extract")
+        if isFile == False:
+            dna = FastaTools.blast_it(args.FolderOfFastas,args.blast,args.genome_file,outw)
+            #2nd) Extract the sequences and create new ones with genome seqs in it
+            FastaTools.extract_blast("Genome.fa","seq_ortho_test.rawblast","TempOrthoFolder/")
         #3rd) Align the new fastas
-        #FastaTools.align_folder("TempOrthoFolder/",args.LocationOfMafft,outw)
+        isFile = Extras.check_if_happened_in_dir("TempOrthoFolder/","aln","end","alignment happened moving to trees")
+        if isFile == False:
+            FastaTools.align_folder("TempOrthoFolder/",args.LocationOfMafft,outw)
         #4th) Infer Tree from the new alignment
-        #LikelihoodTests.RunRaxml("TempOrthoFolder/",args.raxml_location,dna,outw)
+        isFile = Extras.check_if_happened_in_dir("TempOrthoFolder/","RAxML","beg","trees happened moving to ortho examine")
+        if isFile == False:
+            dna = False
+            if args.blast[-1] == "n":
+                dna = True
+            LikelihoodTests.RunRaxml("TempOrthoFolder/",args.raxml_location,dna,outw)
         #5th) Examine placement of genome compared to rest
-        if args.ingroup:
-            TreeTools.identify_ortho_issue("TempOrthoFolder/",args.ingroup,outw)
-        else:
-            TreeTools.identify_ortho_issue("TempOrthoFolder/","",outw)
+        isFile = Extras.check_if_happened("IngroupOrthologyAnalysis.csv","Orthology check already completed\nTo re-run the process please move or remove the following from the directory:\n-TempOrthoFolder/\n-Genome.fa\n-IngroupOrthologyAnalysis.csv\n-OutgroupOrthologyAnalysis.csv\n-seq_ortho_test.rawblast")
+        if isFile == False:
+            if args.ingroup:
+                TreeTools.identify_ortho_issue("TempOrthoFolder/",args.ingroup,outw)
+            else:
+                TreeTools.identify_ortho_issue("TempOrthoFolder/","",outw)
     
     '''
     If nothing ran then print this
@@ -111,7 +123,7 @@ def main(arguments=None):
         print "================================================================"
         print "If you want to extract the fastas from your supermatrix and put\nthem into a separate folder you'll need to give the following arguments\n -d the folder you want the results in\n -z The supermatrix \n -q The partition file"
         print "================================================================"
-        print "For the orthology test you will need to give the following arguments\n -f FolderWithFastas\n -b Location of blast\n -m Location of mafft\n -r Location of raxml\n -g Fasta of GenomeFile or reference of some kind"
+        print "For the orthology test you will need to give the following arguments\n -f FolderWithFastas\n -b Location of blast\n -m Location of mafft\n -r Location of raxml\n -g Fasta of GenomeFile or reference of some kind\n -i If the genome you are using is one of your ingroups, specify which ingroup it is"
         print "================================================================"
         print "For alignment based outlying behavior, you'll need\n -s SpeciesTrees \n -z Supermatrix.fa \n -q PartitionFile (raxml formatted) \n -r Location of raxml"
         print "================================================================"

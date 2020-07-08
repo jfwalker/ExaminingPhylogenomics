@@ -79,3 +79,28 @@ def match_gene_name_to_GWLL(HASH_GWLL,Folder,logfile):
     print "No match could be found, the program examines what is delimited by a . so the gene tree files need to have the name within them"
     logfile.write("No match could be found, the program examines what is delimited by a . so the gene tree files need to have the name within them\n")
     sys.exit(0)
+
+def check_if_happened(Item,message):
+    
+    isFile = os.path.exists(Item)
+    if isFile == True:
+        print message
+    return isFile
+
+def check_if_happened_in_dir(Folder,pattern,pos,message):
+
+    array = os.listdir(Folder)
+    isFile = False
+    for x in array:
+        
+        if pos == "end":
+            test = len(x) - len(pattern)
+            if x[test:] == pattern:
+                isFile = True
+        if pos == "beg":
+            if x[:len(pattern)] == pattern:
+                isFile = True
+    if isFile == True:
+        print message
+    return isFile
+    

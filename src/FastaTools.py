@@ -262,7 +262,7 @@ def blast_it(Folder,blast,genome,logfile):
     #make sure the genome is formatted in an easy way to use
     #a file called genome.fa is
     print "Making genome file easier to use"
-    #genome_format(genome,logfile)
+    genome_format(genome,logfile)
     
     #Check seqs from folder for being aligned
     check_and_comp_seqs(Folder,logfile)

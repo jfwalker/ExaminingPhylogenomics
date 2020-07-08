@@ -198,9 +198,9 @@ def get_smallest_outgroup(clades,genome_seqs):
                 largest = right_array
     
     if temp == len(genome_seqs):
-        return largest,True
-    else:
         return largest,False
+    else:
+        return largest,True
 
 #checks to see if a bipartitions is composed of only genomes
 def only_genomes(bip,genomes):
@@ -237,11 +237,24 @@ def Array_matches(Array1,Array2,number_to_beat):
     else:
         return 0
 
+def does_genome_exist(ingroupname,bipart):
+    
+    left_array = bipart.split("|")[0][:-1].split(",")
+    if ingroupname in left_array:
+        return True
+    right_array = bipart.split("|")[1][1:].split(",")
+    if ingroupname in right_array:
+        return True
+    return False
 
 #get clades without genomes and those with genomes
 def get_smallest_ingroup_given(clades,genome_seqs,ingroupname):
     
-    genome_seqs.append(ingroupname)
+    #Check if the ingroup actually exists!!!!!!!!
+    if ingroupname != "":
+        exists = does_genome_exist(ingroupname,clades[0])
+        if exists == True:
+            genome_seqs.append(ingroupname)
     largest_genome = []
     largest_genome,ans = get_smallest_outgroup(clades,genome_seqs)
     
@@ -380,8 +393,10 @@ def identify_ortho_issue(Folder,ingroup,logfile):
     outw2.write("Gene,WithGenome,OrthologyInvestigate,ReasonForSuggestion\n")
     for x in array:
         if x[6:14] == "bestTree":
+
             tree = open(Folder+x,"r")
             name_array,t = build(tree.readline())
+            clades = []
             clades = post_order(t,name_array,clades)
             #how many sequences come from genomes
             genome_seqs = get_seqs_from_genomes(name_array)
@@ -390,10 +405,9 @@ def identify_ortho_issue(Folder,ingroup,logfile):
             #seqs in it
             bipartition,ortho_error = get_smallest_outgroup(clades,genome_seqs)
             gene = x.split(".")[1]
-            outw.write(HASH[gene] + "," + gene + "," + str(ortho_error)+"\n")
+            outw.write(HASH[gene] + "," + gene + "," + str(ortho_error)+","+" ".join(bipartition)+"\n")
             advice = False
-            if ingroup != "":
-                advice,ortho_error = get_smallest_ingroup_given(clades,genome_seqs,ingroup)
+            advice,ortho_error = get_smallest_ingroup_given(clades,genome_seqs,ingroup)
            
             outw2.write(HASH[gene] + "," + gene + "," + str(ortho_error) + "," + advice +"\n")
             
