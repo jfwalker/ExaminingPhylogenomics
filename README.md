@@ -27,7 +27,7 @@ To run this the following parameters must be specified:
 
 ### Identify gene trees that are possibly misidentified orthology
 
-This will take a genome (Or well sampled transcriptome) in fasta format, find which of the orthologs the sequences from the genome match with blast, align the orthologs with the genome sequences, create a tree and look for a patten in the tree that would indicate the gene has misidentified orthology. It creates some output files and an output folder.
+This will take a genome (Or well sampled transcriptome but just called genome from now on) in fasta format, find which of the orthologs the sequences from the genome match with blast, align the orthologs with the genome sequences, create a tree and look for a patten in the tree that would indicate the gene has misidentified orthology. It creates some output files and an output folder.
 
 The files are:
 
@@ -36,6 +36,10 @@ The files are:
 **IngroupOrthologyAnalysis.csv**: This is the results of if there were any red flags noticed in the positions of the genomes assuming they were ingroups. The file is delimited as: GeneName (from folder specified), gene name with genomes (in TempOrthoFolder), whether a red flag appeared based on the placement of those genomes, what the reason for the flag is or is not.
 
 **gene_conversion.csv**: This is a comma separated file of what your gene names were in the folder vs. what they are now
+
+**Conversion.csv**: This is what the gene names were in the input genome file vs. what they are in the Genome.fa file.
+
+**Genome.fa**: This is a file where the names have been converted.
 
 The folder is:
 
@@ -54,6 +58,19 @@ The other parameters this analysis requires are:
 ```-r the path to raxml classic```
 
 ```-g A genome or transcriptome  or some kind of well sampled fasta```
+
+
+### Correcting a GWLL value to an average SSLL value
+
+This is done because one reason the difference in likelihood can increase is based on gene length. By looking at just the gene value this only tells you the difference in contribution of genes to the final likelihood, but by looking at the Average SSLL value this can inform you that if you correct for length there is still something going on.
+
+Running the program creates the following files:
+
+**RAxML_perSiteLLs.Topologies_SSLL and RAxML_info.Topologies_SSLL**: This is the output from RAxML doing the SSLL topology test, where it calculates all the site likelihoods.
+
+**GWLL.csv and AvgSSLL.csv**: This is the Gene wise log likelihood value and the average sitewise loglikelihood values, for every input species trees.
+
+**Comp_tree0_tree1.csv** This is the comparison of your first tree in the species tree file to your second tree. If you have more trees in the species tree file then it will keep doing comparisons. So three trees will give the additional files: Comp_tree0_tree2.csv and Comp_tree1_tree2.csv.
 
 
 
