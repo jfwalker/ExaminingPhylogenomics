@@ -91,7 +91,9 @@ What this does is look for the different relationship among your provided specie
 
 The output will be:
 
-**Comp_tree0_tree1.csv** This is the comparison of your first tree in the species tree file to your second tree. If you have more trees in the species tree file then it will keep doing comparisons. So three trees will give the additional files: Comp_tree0_tree2.csv and Comp_tree1_tree2.csv.
+**Comp_tree0_tree1.csv**: This is the comparison of your first tree in the species tree file to your second tree. If you have more trees in the species tree file then it will keep doing comparisons. So three trees will give the additional files: Comp_tree0_tree2.csv and Comp_tree1_tree2.csv.
+
+**UniqueBipartitions.txt**: How each species tree compares to eachother, the should only have one difference.
 
 The format of the output is csv with: The gene name, Supports first tree (True/False), supports second tree (True/False), ML supports first tree (True/False/Uninformative), ML supports second tree (True/False/Uninformative).
 
