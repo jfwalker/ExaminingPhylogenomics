@@ -70,14 +70,28 @@ Running the program creates the following files:
 
 **GWLL.csv and AvgSSLL.csv**: This is the Gene wise log likelihood value and the average sitewise loglikelihood values, for every input species trees.
 
+The parameters required are:
+
+```-s This is the Species Trees```
+
+```-z This is the supermatrix```
+
+```-q This is the RAxML formatted partition file```
+
+```-r This is the location of RAxML```
+
+
+### Comparing the results of an ML analysis to the GWLL/SSLL analysis
+
+The reasons these may differ is in the paper, can explain some disparity in gene tree conflict analysis
+
+What this does is look for the different relationship among your provided species tree. If more than one exists this will proceed using the random first one it finds and the results of this should not be compared. Make sure the input species trees only have one relationship. This requires ML trees whose names can be matched to the GWLL results. The matching is identified by looking at different subsets between a period, so if your ML trees do not have a period in the name it will not be able to match. The reason a period is used is because most of these files end in .tre or some variation or they may be like RAxML and have the name after the period. To compare whether the ML results match the GWLL results you will need to have run or also be running this at the same time and give the folder of trees using the parameter:
+
+```-t Folder of trees```
+
+The output will be:
+
 **Comp_tree0_tree1.csv** This is the comparison of your first tree in the species tree file to your second tree. If you have more trees in the species tree file then it will keep doing comparisons. So three trees will give the additional files: Comp_tree0_tree2.csv and Comp_tree1_tree2.csv.
 
-
-
-
-
-
-
-
-
+The format of the output is csv with:
 
