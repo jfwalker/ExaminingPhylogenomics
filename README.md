@@ -93,5 +93,18 @@ The output will be:
 
 **Comp_tree0_tree1.csv** This is the comparison of your first tree in the species tree file to your second tree. If you have more trees in the species tree file then it will keep doing comparisons. So three trees will give the additional files: Comp_tree0_tree2.csv and Comp_tree1_tree2.csv.
 
-The format of the output is csv with:
+The format of the output is csv with: The gene name, Supports first tree (True/False), supports second tree (True/False), ML supports first tree (True/False/Uninformative), ML supports second tree (True/False/Uninformative).
+
+The reason the ML may be uninformative is it possibly does not contain a bipartition that is being compared (either doesn't have sampling or tree structure). The GWLL is always forced to choose between the two topologies so it will always be True or False. 
+
+
+### Finally
+
+The program will create a logfile that is good to look over because if anything said in it seems off (It found more genes than you expected etc.) then that's something to investigate. With no specification is will create something called logfile.log or logfile can be specified with:
+
+```-l Logfile name```
+
+End of the day this is academic software, it attempts to automate some tedious procedures (e.g. examining every gene tree), but if something seems very off definitely contact. Also, if you have any questions or would like anything added to the software, feel free to contact for that too. You can find my email, [here](https://www.slcu.cam.ac.uk/people/walker-joseph) underneath the unfortunate picture from my first day at Cambridge.
+
+
 
