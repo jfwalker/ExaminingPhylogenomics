@@ -43,6 +43,8 @@ Run the reverse concatenate with:
 
 ```python src/ExaminePhylogenomicData.py -d TestFolder/ -z example_data/ExampleConcat.fa -q example_data/ExampleGenes.model```
 
+The folder should now be filled with the fasta's that made up the partition. To the screen will be printed what the program thought the first gene (partition) was (this is also printed to the logfile). If the first gene does not match what the partition file says, then something went wrong and you should investigate this. If the partition file cannot be broken into genes it is likely because the partition file has some type of issue or is not RAxML formatted, the logfile should have the predicted reason why it didn't work to help troubleshoot but there are so many possibilities it's hard to account for all of them.
+
 ### Identify gene trees that are possibly misidentified orthology
 
 This will take a genome (Or well sampled transcriptome but just called genome from now on) in fasta format, find which of the orthologs the sequences from the genome match with blast, align the orthologs with the genome sequences, create a tree and look for a patten in the tree that would indicate the gene has misidentified orthology. It creates some output files and an output folder.
@@ -76,6 +78,22 @@ The other parameters this analysis requires are:
 ```-r the path to raxml classic```
 
 ```-g A genome or transcriptome  or some kind of well sampled fasta```
+
+**Example**
+
+To run this you will first either need a genome file or a well sampled transcriptome file. Since this is a dataset of vertebrates and in the paper we use chicken as an example this will be used here. First you want to down load the genome for chicken from a website like [Ensembl](https://www.ensembl.org/info/data/ftp/index.html). By clicking on the link that says Fasta next to Gallus gallus you should be brought to the [ftp download](ftp://ftp.ensembl.org/pub/release-100/fasta/gallus_gallus/cds/). You can then download on the command line using wget and the link address.
+
+```wget ftp://ftp.ensembl.org/pub/release-100/fasta/gallus_gallus/cds/Gallus_gallus.GRCg6a.cds.all.fa.gz```
+
+Uncompress the file with
+
+```gunzip Gallus_gallus.GRCg6a.cds.all.fa.gz```
+
+Then you can run the orthology detection with the following command. The ```-i``` is used since Gallus is in the analysis. Also, be sure to change the path and names of the programs to the ones you have.
+
+```python src/ExaminePhylogenomicData.py -f TestFolder/ -b blastn -m mafft -r raxmlHPC-AVX -g Gallus_gallus.GRCg6a.cds.all.fa -i Gallus```
+
+Since Gallus is a predicted ingroup, in this case it actually is an ingroup, you should look in the IngroupOrthologyAnalysis.csv folder. In there the gene ENSGALG00000008314 that we discuss in the [paper](https://www.biorxiv.org/content/10.1101/2020.04.20.049999v1.abstract) should be flagged as True. This means to investigate further. If you open the tree, with something like [figtree](http://tree.bio.ed.ac.uk/software/figtree/) you should see a similar pattern to that which is shown as supplementary figure 5. The gene was flagged because no matter how you root it, it is impossible to have the (genomes+Gallus) defined by just two clades. Part of why I like this example is that it is imperfect, it does not detect two of the genes pointed out by [Brown and Thomson](https://academic.oup.com/sysbio/article/66/4/517/2950896), this is in part because the dataset goes back to when the ancestor of humans was on land. Blast does not identify all the genes because the similarity used is 1e-3, to identify more of the misidentified orthology you can use the protein coding sequences or re-run with a different genome. Gene duplication and loss etc. can prevent some of these issues from being detected with just one genome, so the more you check with the more you are likely to identify.
 
 
 ### Correcting a GWLL value to an average SSLL value
