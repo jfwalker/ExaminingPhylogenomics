@@ -13,6 +13,12 @@ There are essentially four analyses that can be performed as of now. The program
 
 As of now this is the different functions the program can do. Although I am planning on updating this periodically depending on if people ask for something or I need some type of utility for investigating phylogenomic data.
 
+To download the scripts run this command. The example data comes from this [paper](https://bmcbiol.biomedcentral.com/articles/10.1186/1741-7007-10-65) where they did a great job depositing data which is incredibly helpful.
+
+Download command
+
+```git clone https://github.com/jfwalker/ExaminingPhylogenomics.git```
+
 ### Reverse concatenate
 
 This is exactly what it says, it takes in a supermatrix, a partition file and splits the partitions into a folder.
@@ -24,6 +30,18 @@ To run this the following parameters must be specified:
 ```-z The name of the supermatrix file```
 
 ```-q The name of the RAxML formatted partition file```
+
+**Example**
+
+If you want you can just specify all parameters and the program will run everything at once, but for the walkthrough it's easier to do them one at a time.
+
+After you have downloaded the folder, you'll first want to make an output folder with:
+
+```mkdir TestFolder/```
+
+Run the reverse concatenate with:
+
+```python src/ExaminePhylogenomicData.py -d TestFolder/ -z example_data/ExampleConcat.fa -q example_data/ExampleGenes.model```
 
 ### Identify gene trees that are possibly misidentified orthology
 
