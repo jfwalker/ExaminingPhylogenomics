@@ -116,10 +116,17 @@ The parameters required are:
 
 ```-r This is the location of RAxML```
 
+**Example**
+
+The command to run this is:
+
+```python src/ExaminePhylogenomicData.py -s example_data/ThreeUnrootedTrees.tre -z example_data/ExampleConcat.fa -q example_data/ExampleGenes.model -r raxmlHPC-AVX```
+
+The outputs will be what is mentioned above, although it's important to notice that the third tree in the file (tree2) contains more than one difference with the first tree (tree0) and the second tree (tree1). Positive numbers indicate support for the first tree listed in the comparison and negative numbers indicate support for the second tree.
 
 ### Comparing the results of an ML analysis to the GWLL/SSLL analysis
 
-The reasons these may differ is in the paper, can explain some disparity in gene tree conflict analysis
+The reasons these may differ is in the paper, and can explain some disparity in gene tree conflict analysis
 
 What this does is look for the different relationship among your provided species tree. If more than one exists this will proceed using the random first one it finds and the results of this should not be compared. Make sure the input species trees only have one relationship. This requires ML trees whose names can be matched to the GWLL results. The matching is identified by looking at different subsets between a period, so if your ML trees do not have a period in the name it will not be able to match. The reason a period is used is because most of these files end in .tre or some variation or they may be like RAxML and have the name after the period. To compare whether the ML results match the GWLL results you will need to have run or also be running this at the same time and give the folder of trees using the parameter:
 
@@ -135,6 +142,15 @@ The format of the output is csv with: The gene name, Supports first tree (True/F
 
 The reason the ML may be uninformative is it possibly does not contain a bipartition that is being compared (either doesn't have sampling or tree structure). The GWLL is always forced to choose between the two topologies so it will always be True or False. 
 
+**Example**
+
+To avoid recomputing everything from above, the program checks that there is a RAxML*.Topologies_SSLL file that has been run in the current directory and if there is then it will just skip to dissecting the trees.
+
+```python src/ExaminePhylogenomicData.py -s example_data/ThreeUnrootedTrees.tre -z example_data/ExampleConcat.fa -q example_data/ExampleGenes.model -r raxmlHPC-AVX -t example_data/BestTrees/```
+
+The bottom line printed to screen and to the logfile will be the predicted match between the names and the GWLL file, if it is unable to predict the match then that will be an issue linking GWLL support and ML support for a topology. 
+
+The data in this case is again an imperfect example for the sake of examining behavior when the input specified is far from the ideal. The first tree and the second tree from the file ThreeUnrootedTrees.tre have just one clade isolated as different so that comparison is fine and that input is ok. This is also shown in the UniqueBipartitions.txt file. The third tree has a lot of differing bipartitions, so it should not be used for this comparison with the first (tree0) or second tree (tree1) in the file. Overall, three comparisons should be made but the only that has a single isolated relationship and therefore can really be compared is the first and second trees in the file, so file: Comp_tree0_tree1.csv.
 
 ### Finally
 
@@ -142,7 +158,7 @@ The program will create a logfile that is good to look over because if anything 
 
 ```-l Logfile name```
 
-End of the day this is academic software, it attempts to automate some tedious procedures (e.g. examining every gene tree), but if something seems very off definitely contact. Also, if you have any questions or would like anything added to the software, feel free to contact for that too. You can find my email, [here](https://www.slcu.cam.ac.uk/people/walker-joseph) underneath the unfortunate picture from my first day at Cambridge.
+End of the day this is academic software, it attempts to automate some tedious procedures (e.g. examining every gene tree), but if something seems very off definitely contact. Also, if you have any questions or would like anything added to the software, feel free to contact for that too. You can find my email, [here](https://www.slcu.cam.ac.uk/people/walker-joseph) underneath the unfortunate picture from my first day at Cambridge. Good luck!
 
 
 
