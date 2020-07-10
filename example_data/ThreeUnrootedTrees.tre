@@ -1,0 +1,3 @@
+(protopterus,Xenopus,((Ornithorhynchus,(Homo,Monodelphis)),((podarcis,(Anolis,python)),((Gallus,Taeniopygia),((alligator,caiman),(phrynops,(caretta,(chelonoidis_nigra,emys_orbicularis))))))));
+(protopterus,Xenopus,(((Homo,Monodelphis),Ornithorhynchus),((podarcis,(Anolis,python)),(((Gallus,Taeniopygia),(alligator,caiman)),(phrynops,(caretta,(chelonoidis_nigra,emys_orbicularis)))))));
+(protopterus,Xenopus,(((caiman,alligator),(Taeniopygia,Gallus)),(((chelonoidis_nigra,(caretta,emys_orbicularis)),phrynops),((Homo,Monodelphis),(python,(podarcis,(Ornithorhynchus,Anolis)))))));
